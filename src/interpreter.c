@@ -31,12 +31,13 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
-#include "interpreter.h"
+#include "../include/interpreter.h"
+#include "../include/stringobj.h"
 
 /*
  * What needs to be defined in order to bootstrap:
  * - string functions (string declare, string add)
- * - goto to a line (so for loops can be implemented)
+ * - goto to a line (so for loops can be implemented) and goto next function with specified name ("goto function: elseif"), so control flows can be implemented
  * - ability to call, declare methods
  * - ability to interpret one condition (10 > 5) - only numbers is enough
  * - ability to store ("store: 5, var")
@@ -48,9 +49,20 @@
  * - ability to use system commands (like system())
  */
 
-// Static Prototypes
+/*
+ * Example if statement to be implemented inside the interpreted language:
+ * (nothing can be named "and" or "or")
+ * if: 10 > 5
+ * 	print: "hello\n"
+ * elseif: 5 > 10
+ * 	print: "wacked\n"
+ * else:
+ * 	print: "math is crazy!\n"
+ * end
+ */
 
-vm_t* *vm_init(FILE *stream) {
+// Static Prototypes
+vm_t** vm_init(FILE *stream) {
 
 }
 
@@ -60,4 +72,52 @@ vm_t* vm_free() {
 
 void interpreter_ignition(vm_t *virt) {
 
+}
+
+void interpreter_preprocessfile(FILE *stream) {
+	string_t *line = string_init();
+	int readStatus;
+	while ((readStatus = readLine(line, stream)) != EOF) {
+
+		string_reset(line); // more efficient :)
+	}
+	// Free Resources
+	string_free(line);
+}
+
+static int readLine(string_t *str, FILE *stream) {
+	char letter;
+	while ((letter = fgetc(stream)) != EOF) {
+		if (letter == '\n')
+			break;
+		else
+			string_appendchar(str, letter);
+	}
+	return letter;
+}
+
+parsed_instruction_t* parse(string_t *delimiter, string_t *line) {
+	parsed_instruction_t *instr = malloc(sizeof(parsed_instruction_t));
+	string_t **two_pairs = string_split(delimiter, line);
+	instr->name = p
+	instr->args = parse_split_offquotes(delimiter, two_pairs[1]);
+}
+
+static list_t* parse_split_offquotes(string_t *delimiter, string_t *line) {
+	list_t *list = list_init();
+	string_t *currentString = string_init();
+
+	bool isString = false;
+	for (int i = 0; i < line->text_length; i++) {
+		if (line[i] == '"' || line[i] == '\'') {
+			isString = !isString;
+		} else if (!isString && line[i] == ',') {
+			list_add(string_copyvalueof_s(currentString), list);
+			string_reset(currentString);
+		}
+		string_append(currentString, line[i]);
+	}
+	lista_add(currentString);
+
+	return list;
 }

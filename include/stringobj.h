@@ -30,9 +30,10 @@
 #ifndef STRINGOBJ_H_
 #define STRINGOBJ_H_
 
+#include <stdio.h>
 #include <stdbool.h>
 
-#define STRING_ALLOCATION_SIZE 10
+#define STRING_ALLOCATION_SIZE 5
 
 /*
  * Philosophy:
@@ -58,6 +59,13 @@ string_t *string_copyvalueof_s(string_t *src);
 void string_append(string_t *dest, char *src);
 void string_append_s(string_t *dest, string_t *src);
 
+void string_appendchar(string_t *dest, char letter);
+
+/**
+ * Returns 2 strings that are split from the delimiters
+ */
+string_t** string_split(char *delimiter);
+
 // Comparisons between strings
 bool string_equals(string_t *dest, char *src);
 bool string_equals_s(string_t *dest, string_t *src);
@@ -68,6 +76,9 @@ bool string_equalsignorecase_s(string_t *dest, string_t *src);
 // Making modifications to the string
 void string_tolowercase_s(string_t *dest);
 void string_reset(string_t *dest);
+
+void string_serialize(string_t *src, FILE *stream);
+string_t* string_deserialize(FILE *stream);
 
 void string_free(string_t *dest);
 

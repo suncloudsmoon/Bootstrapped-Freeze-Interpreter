@@ -21,29 +21,52 @@
  */
 
 /*
- * throwable.h
+ * listobj.h
  *
- *  Created on: Jul 23, 2021
+ *  Created on: Jul 25, 2021
  *      Author: suncloudsmoon
  */
 
-#ifndef THROWABLE_H_
-#define THROWABLE_H_
+#ifndef LISTOBJ_H_
+#define LISTOBJ_H_
 
-/*
- * This class is inspired from the Java's throwable class
+#include <stdio.h>
+
+#define LIST_MANAGER_ALLOC_SIZE 10
+
+typedef struct {
+	void **data;
+
+	int data_length;
+	int data_allocated_length;
+} list_t;
+
+list_t* list_init();
+
+void list_add(void *item, list_t *list);
+
+void list_remove(int index, list_t *list);
+/**
+ * Completely frees the individual item to be removed by calling the respective free method
+ * of the data type (like freeing structs).
  */
+void list_complete_remove(void (*indivfree) (void *), int index, list_t *list);
 
-// I don't know, but I am just used to typedefs more than without typedefs
-typedef enum {
-	ERRNO_EXCEPTION = 1,
-	NULL_POINTER_EXCEPTION = 2,
-	INDEX_OUT_OF_BOUNDS_EXCEPTION = 3
-} exception;
+void list_clear(list_t *list);
 
 /**
- * An exception will be displayed on console with the line number.
+ * Compares the data according to how the data must be compared with the equalsComparator function
  */
-void throw_exception(exception e, int lineNum, char *message, ...);
+bool list_equals(void *destComp, int index, bool (*equalsComparator) (void*, void*), list_t *list);
+bool list_contains(void *destComp, bool *(equalsComparator) (void *, void *), list_t *list);
 
-#endif /* THROWABLE_H_ */
+void list_serialize(void (*indiv) (void *, FILE *), FILE *stream, list_t *list);
+list_t* list_deserialize(void* (*indivreverse) (FILE *));
+
+void list_free(list_t *list);
+/**
+ * Frees the individual data (like structs) inside the void pointer.
+ */
+void list_complete_free(void (*indivfree) (void *), list_t *list);
+
+#endif /* LISTOBJ_H_ */

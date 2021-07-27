@@ -30,11 +30,36 @@
 #ifndef INTERPRETER_H_
 #define INTERPRETER_H_
 
-#include "stringobj.h"
+#include "../include/stringobj.h"
+#include "../include/listobj.h"
+#include "../deps/tinyexpr/tinyexpr.h"
 
 typedef struct {
+	string_t *name;
+	list_t *args;
+} parsed_instruction_t;
+
+// Everything is a function in my language :)
+
+typedef struct {
+	list_t *parsed_instructions; // List of parsed_instruction_t
+	list_t *local_variables; // LOOK: hopefully this works because I was supposed to use te_variable array
+} function_t;
+
+typedef struct {
+	// Core internal features of the interpreter
+	string_t *split_delimiter; // This is going to be a whitespace
+
 	// Function identifiers
 	string_t *string_declare, *string_add;
+	string_t *goto_line, *goto_function;
+	string_t *method_declare;
+	string_t *var_store;
+	string_t *print_function, *read_function, *write_function, *system_function;
+
+	// Lists
+	list_t *global_variables; // list of te_variable structs
+	list_t *function_list; // list of function_t structs
 
 } vm_t; // Short and simple name
 

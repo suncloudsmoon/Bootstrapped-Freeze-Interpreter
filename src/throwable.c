@@ -34,15 +34,28 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <errno.h>
+#include <stdarg.h>
+#include <ctype.h>
+#include <string.h>
 
 #include "../include/throwable.h"
 
-void throw_exception(exception e, int lineNum, char *message) {
-	char cMessage[50];
-	if (lineNum == -1)
-		sprintf(cMessage, "Internal Error");
-	else
-		sprintf(cMessage, "Line #%d", lineNum);
+#define AVG_STRING_SIZE 2048
+
+void throw_exception(exception e, int lineNum, char *message, ...) {
+	// TODO: add a predefined message for errors like index out of bounds exception, etc.
+
+	va_list args;
+	va_start(args, message);
+	char cMessage[AVG_STRING_SIZE];
+	if (lineNum == -1) {
+		strcpy(cMessage, "Internal Error [");
+		vsnprintf(cMessage, AVG_STRING_SIZE, message, args);
+		strcat(cMessage, "]");
+	} else {
+		snprintf(cMessage, AVG_STRING_SIZE, "Line #%d", lineNum);
+	}
+	va_end(args);
 
 	// Goes through the different types of error and prints out the appropriate message
 	switch (e) {
@@ -50,6 +63,9 @@ void throw_exception(exception e, int lineNum, char *message) {
 		perror(cMessage);
 		break;
 	case NULL_POINTER_EXCEPTION:
+		fprintf(stderr, "%s: %s\n", cMessage, message);
+		break;
+	case INDEX_OUT_OF_BOUNDS_EXCEPTION:
 		fprintf(stderr, "%s: %s\n", cMessage, message);
 		break;
 	default:
