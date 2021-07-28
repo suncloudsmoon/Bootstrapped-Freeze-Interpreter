@@ -42,24 +42,28 @@ typedef struct {
 // Everything is a function in my language :)
 
 typedef struct {
+	list_t *args;
 	list_t *parsed_instructions; // List of parsed_instruction_t
 	list_t *local_variables; // LOOK: hopefully this works because I was supposed to use te_variable array
 } function_t;
 
 typedef struct {
 	// Core internal features of the interpreter
-	string_t *split_delimiter; // This is going to be a whitespace
+	char set_delimiter;
+	char arg_delimiter;
 
 	// Function identifiers
-	string_t *string_declare, *string_add;
+	string_t *function_declare, *function_end;
+
+	string_t *var_declare, *var_add;
 	string_t *goto_line, *goto_function;
-	string_t *method_declare;
-	string_t *var_store;
+
 	string_t *print_function, *read_function, *write_function, *system_function;
 
 	// Lists
 	list_t *global_variables; // list of te_variable structs
 	list_t *function_list; // list of function_t structs
+	int currentFunction;
 
 } vm_t; // Short and simple name
 
@@ -67,17 +71,24 @@ typedef struct {
  * Initializes the interpreter's virtual machine, where every variable and other stuff is stored that is
  * going to be used throughout the process of the interpreter
  */
-vm_t* *vm_init(FILE *stream);
+vm_t* vm_init();
 /**
  * Frees whatever the interpreter has been storing in the vm_t structure.
  */
-vm_t* vm_free();
+void vm_free(vm_t *vm);
 
 /**
  * Starts the interpreter provided a file containing the interpreter code
  * Inspiration from the V8's ignition
  */
-void interpreter_ignition(vm_t *virt);
+void interpreter_ignition(FILE *stream, vm_t *virt);
+void interpreter_preprocessfile(FILE *stream, vm_t *vm);
+parsed_instruction_t* parse(char whitespace_delimiter, char arg_delimiter,
+		string_t *line);
 
+function_t* function_init(list_t *args);
+void function_free(void *funct);
+
+void parsed_instruction_free(void *instruction);
 
 #endif /* INTERPRETER_H_ */

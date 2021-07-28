@@ -73,6 +73,8 @@ bool string_equals_s(string_t *dest, string_t *src);
 bool string_equalsignorecase(string_t *dest, char *src);
 bool string_equalsignorecase_s(string_t *dest, string_t *src);
 
+bool string_startswith_s(string_t *src, string_t *search);
+
 // Making modifications to the string
 void string_tolowercase_s(string_t *dest);
 void string_reset(string_t *dest);
@@ -80,6 +82,6 @@ void string_reset(string_t *dest);
 void string_serialize(string_t *src, FILE *stream);
 string_t* string_deserialize(FILE *stream);
 
-void string_free(string_t *dest);
+void string_free(void *dest);
 
 #endif /* STRINGOBJ_H_ */

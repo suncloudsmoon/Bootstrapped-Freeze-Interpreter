@@ -114,7 +114,7 @@ void string_appendchar(string_t *dest, char letter) {
 	dest->text[dest->text_length + 1] = '\0';
 }
 
-string_t** string_split(char *delimiter, string_t *src) {
+string_t** string_split(char delimiter, string_t *src) {
 	// Safety
 	// If the string is length 2 or less, then it is not possible to split the string
 	if (src->text_length <= 2)
@@ -126,7 +126,15 @@ string_t** string_split(char *delimiter, string_t *src) {
 	strList[0] = custom_string_init(src->text_length / 2);
 	strList[1] = custom_string_init(src->text_length / 2);
 
-	int splitIndex = strcspn(delimiter, delimiter);
+	char delimiterText[2];
+	delimiterText[0] = delimiter;
+	delimiterText[1] = '\0';
+	int splitIndex = strcspn(src->text, delimiterText);
+
+	if (splitIndex == src->text) {
+		return NULL;
+	}
+
 	for (int i = 0; i < splitIndex; i++) {
 		string_appendchar(strList[0], src->text[i]);
 	}
@@ -174,9 +182,15 @@ bool string_equalsignorecase_s(string_t *dest, string_t *src) {
 	}
 }
 
+bool string_startswith_s(string_t *src, string_t *search) {
+	return strcspn(src->text, search->text) != src->text_length;
+}
+
 void string_tolowercase_s(string_t *dest) {
 	for (int i = 0; i < dest->text_length; i++)
 		dest->text[i] = tolower(dest->text[i]);
+//	for (char *letter = dest->text; *letter; letter++)
+//		*letter = tolower(*letter);
 }
 
 void string_reset(string_t *dest) {
@@ -200,11 +214,11 @@ string_t* string_deserialize(FILE *stream) {
 	return str;
 }
 
-void string_free(string_t *dest) {
+void string_free(void *dest) {
 	// Free string inside dest
-	free(dest->text);
+	free(((string_t*) dest)->text);
 	// Free the structure itself
-	free(dest);
+	free(((string_t*) dest));
 }
 
 // Memory related functions
